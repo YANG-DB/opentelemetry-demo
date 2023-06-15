@@ -363,6 +363,9 @@ This will return the following response:
 }
 ```
 
+All the instrumented metrics are described [here](https://opentelemetry.io/docs/demo/metric-features/)
+
+
 ### **Reference**
 Project reference documentation, like requirements and feature matrices [here](https://opentelemetry.io/docs/demo/#reference)
 
