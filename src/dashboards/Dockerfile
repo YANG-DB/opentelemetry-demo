@@ -5,7 +5,7 @@ ARG VERSION=2.11.0
 FROM opensearchproject/opensearch-dashboards:${VERSION}
 
 # Re-declare ARG BRANCH_NAME to use within this build stage
-ARG BRANCH_NAME=feature/metrics-editor-and-promql-demo-nov6-141300
+ARG BRANCH_NAME=main
 
 # Echo the arguments to confirm their values
 RUN echo "Building with OpenSearch Dashboards version: $VERSION" && \
@@ -20,7 +20,6 @@ USER root
 # Install Git
 RUN yum update -y && \
     yum install -y git
-
 
 # Install NVM, Node.js, and Yarn
 ENV NVM_DIR /usr/local/nvm
@@ -44,9 +43,6 @@ RUN git clone --branch ${VERSION} https://github.com/opensearch-project/OpenSear
 
 # Change directory to the cloned repository plugin folder
 WORKDIR /usr/share/opensearch-dashboards/OpenSearch-Dashboards
-
-# Echo the contents of the current directory
-RUN ls -la
 
 # Install dependencies and build the plugin
 RUN yarn osd bootstrap
