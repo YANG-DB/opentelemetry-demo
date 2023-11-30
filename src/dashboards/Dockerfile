@@ -37,27 +37,35 @@ RUN . $NVM_DIR/nvm.sh && \
 # Add NVM binaries to PATH for subsequent commands
 ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
+ARG VERSION=2.11.0
+
+# Clone the specific branch of the repository
+RUN git clone --branch ${VERSION} https://github.com/opensearch-project/OpenSearch-Dashboards.git
+
+# Change directory to the cloned repository plugin folder
+WORKDIR /usr/share/opensearch-dashboards/OpenSearch-Dashboards
+
+# Echo the contents of the current directory
+RUN ls -la
+
+# Install dependencies and build the plugin
+RUN yarn osd bootstrap
+
+# Change directory to the cloned repository plugin folder
+WORKDIR /usr/share/opensearch-dashboards/OpenSearch-Dashboards/plugins
+
 # Clone the specific branch of the repository
 RUN git clone --branch ${BRANCH_NAME} https://github.com/opensearch-project/dashboards-observability.git
 
-# Change directory to the cloned repository
-WORKDIR /usr/share/opensearch-dashboards/dashboards-observability
+# Go back to OpenSearch Dashboards directory
+WORKDIR /usr/share/opensearch-dashboards/OpenSearch-Dashboards/plugins/dashboards-observability
 
 # Install dependencies and build the plugin
-RUN yarn install && \
-    yarn run build
-
-# Go back to OpenSearch Dashboards directory
-WORKDIR /usr/share/opensearch-dashboards
+RUN yarn build
 
 # Remove the existing plugin, if installed, and install the newly built one
 RUN /usr/share/opensearch-dashboards/bin/opensearch-dashboards-plugin remove observabilityDashboards && \
-    /usr/share/opensearch-dashboards/bin/opensearch-dashboards-plugin install file:///usr/share/opensearch-dashboards/dashboards-observability/build/observabilityDashboards.zip
-
-# Cleanup: Remove the repository and other unnecessary packages to reduce image size
-RUN rm -rf /usr/share/opensearch-dashboards/dashboards-observability && \
-    yum remove -y git nodejs && \
-    yum clean all
+    /usr/share/opensearch-dashboards/bin/opensearch-dashboards-plugin install file:////usr/share/opensearch-dashboards/OpenSearch-Dashboards/plugins/dashboards-observability/build/observabilityDashboards-${VERSION}.zip
 
 # Switch back to opensearch user
 USER opensearch-dashboards
