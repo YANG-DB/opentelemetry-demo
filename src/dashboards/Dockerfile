@@ -45,7 +45,7 @@ RUN git clone --branch ${VERSION} https://github.com/opensearch-project/OpenSear
 WORKDIR /usr/share/opensearch-dashboards/OpenSearch-Dashboards
 
 # Install dependencies and build the plugin
-RUN yarn osd bootstrap
+RUN yarn osd bootstrap --allow-root
 
 # Change directory to the cloned repository plugin folder
 WORKDIR /usr/share/opensearch-dashboards/OpenSearch-Dashboards/plugins
@@ -57,7 +57,7 @@ RUN git clone --branch ${BRANCH_NAME} https://github.com/opensearch-project/dash
 WORKDIR /usr/share/opensearch-dashboards/OpenSearch-Dashboards/plugins/dashboards-observability
 
 # Install dependencies and build the plugin
-RUN yarn build
+RUN yarn build --allow-root
 
 # Remove the existing plugin, if installed, and install the newly built one
 RUN /usr/share/opensearch-dashboards/bin/opensearch-dashboards-plugin remove observabilityDashboards && \
