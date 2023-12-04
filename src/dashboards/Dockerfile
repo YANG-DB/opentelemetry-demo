@@ -1,11 +1,9 @@
 # Declare a build argument for the version
 ARG VERSION=2.11.0
+ARG BRANCH_NAME=feature/metrics-editor-and-promql-demo-nov6-141300
 
 # Use OpenSearch image as base
 FROM opensearchproject/opensearch-dashboards:${VERSION}
-
-# Re-declare ARG BRANCH_NAME to use within this build stage
-ARG BRANCH_NAME=main
 
 # Echo the arguments to confirm their values
 RUN echo "Building with OpenSearch Dashboards version: $VERSION" && \
@@ -36,32 +34,15 @@ RUN . $NVM_DIR/nvm.sh && \
 # Add NVM binaries to PATH for subsequent commands
 ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
-ARG VERSION=2.11.0
+# Copy the build script
+COPY build-plugin.sh /usr/share/opensearch-dashboards/
 
-# Clone the specific branch of the repository
-RUN git clone --branch ${VERSION} https://github.com/opensearch-project/OpenSearch-Dashboards.git
-
-# Change directory to the cloned repository plugin folder
-WORKDIR /usr/share/opensearch-dashboards/OpenSearch-Dashboards
-
-# Install dependencies and build the plugin
-RUN yarn osd bootstrap --allow-root
-
-# Change directory to the cloned repository plugin folder
-WORKDIR /usr/share/opensearch-dashboards/OpenSearch-Dashboards/plugins
-
-# Clone the specific branch of the repository
-RUN git clone --branch ${BRANCH_NAME} https://github.com/opensearch-project/dashboards-observability.git
-
-# Go back to OpenSearch Dashboards directory
-WORKDIR /usr/share/opensearch-dashboards/OpenSearch-Dashboards/plugins/dashboards-observability
-
-# Install dependencies and build the plugin
-RUN yarn build --allow-root
-
-# Remove the existing plugin, if installed, and install the newly built one
-RUN /usr/share/opensearch-dashboards/bin/opensearch-dashboards-plugin remove observabilityDashboards && \
-    /usr/share/opensearch-dashboards/bin/opensearch-dashboards-plugin install file:////usr/share/opensearch-dashboards/OpenSearch-Dashboards/plugins/dashboards-observability/build/observabilityDashboards-${VERSION}.zip
+# Set permissions and run the build script
+RUN chmod +x /usr/share/opensearch-dashboards/build-plugin.sh && \
+    /usr/share/opensearch-dashboards/build-plugin.sh $VERSION $BRANCH_NAME
 
 # Switch back to opensearch user
 USER opensearch-dashboards
+
+# Install the built plugin
+RUN /usr/share/opensearch-dashboards/bin/opensearch-dashboards-plugin install file:///usr/share/built-plugins/observabilityDashboards-${VERSION}.zip
