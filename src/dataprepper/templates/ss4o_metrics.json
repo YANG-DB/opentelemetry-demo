@@ -220,8 +220,13 @@
         "instrumentationScope": {
           "properties": {
             "name": {
-              "type": "keyword",
-              "ignore_above": 256
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
             },
             "version": {
               "type": "keyword",
@@ -253,7 +258,7 @@
       }
     },
     "aliases" : {
-      "otel-metrics" : {}
+      "otel-metrics-" : {}
     },
     "settings": {
       "index": {

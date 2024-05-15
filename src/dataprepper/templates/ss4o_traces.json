@@ -185,7 +185,7 @@
       }
     },
     "aliases" : {
-      "otel-v1-apm-span" : {}
+      "otel-v1-apm-span-" : {}
     }
   },
   "composed_of": [],
