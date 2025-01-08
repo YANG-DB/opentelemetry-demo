@@ -681,7 +681,7 @@ services:
     hostname: jaeger-agent
     command: ["--reporter.grpc.host-port=jaeger:14250"]
     ports:
-      - "${GRAFANA_SERVICE_PORT}"
+      - "${GRAFANA_SERVICE_PORT}:${GRAFANA_SERVICE_PORT}"
       - "5775:5775/udp"
       - "6831:6831/udp"
       - "6832:6832/udp"
@@ -696,12 +696,13 @@ services:
 
   # Grafana
   grafana:
-    image: grafana/grafana:10.2.0
+    image: ${GRAFANA_IMAGE}
     container_name: grafana
     deploy:
       resources:
         limits:
           memory: 100M
+    restart: unless-stopped
     environment:
       - "GF_INSTALL_PLUGINS=grafana-opensearch-datasource"
     volumes:
